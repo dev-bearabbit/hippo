@@ -16,8 +16,8 @@ pub fn update_menu_bar( ui: &mut egui::Ui) {
 }
 
 fn theme_light_dark_mode(ui: &mut egui::Ui) {
-    ui.label("LIGHT/DARK MODE");
-    ui.horizontal(|ui| {
+
+    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
         egui::widgets::global_dark_light_mode_buttons(ui);
     });
 }

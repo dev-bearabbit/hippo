@@ -18,17 +18,16 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "Hippo",
         options,
-        Box::new(|_cc| Ok(Box::<MyApp>::default())),
+        Box::new(|_cc| Ok(Box::<Hippo>::default())),
     )
 }
 
 #[derive(Default)]
-struct MyApp {
+struct Hippo {
     table_data: Table,
-
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for Hippo {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
         egui::Rgba::TRANSPARENT.to_array() // Make sure we don't paint anything behind the rounded corners
     }
