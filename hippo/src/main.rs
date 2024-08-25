@@ -35,7 +35,7 @@ impl eframe::App for MyApp {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         layout::custom_window_frame(ctx, "Hippo", |ui| {
-            menu::theme_light_dark_mode(ui);
+            menu::update_menu_bar(ui);
 
             ui.label("FILE OPEN TEST");
 
