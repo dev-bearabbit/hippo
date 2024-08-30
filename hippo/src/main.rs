@@ -1,6 +1,5 @@
-use hippo::apps::{file, menu, layout};
-use hippo::models::format::Table;
-
+use hippo::apps::menu::Menu;
+use hippo::apps::{file,layout};
 use eframe::egui;
 
 fn main() -> eframe::Result {
@@ -24,7 +23,7 @@ fn main() -> eframe::Result {
 
 #[derive(Default)]
 struct Hippo {
-    table_data: Table,
+    menu: Menu
 }
 
 impl eframe::App for Hippo {
@@ -32,20 +31,30 @@ impl eframe::App for Hippo {
         egui::Rgba::TRANSPARENT.to_array() // Make sure we don't paint anything behind the rounded corners
     }
 
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {        
         layout::custom_window_frame(ctx, "Hippo", |ui| {
-            menu::update_menu_bar(ui);
+            self.menu.update_menu_bar(ui);
 
-            ui.label("FILE OPEN TEST");
+            ui.horizontal(|ui| {
+                // 사이드바 영역
+                ui.vertical(|ui| {
+                    let sidebar_width = 200.0; // 사이드바의 고정된 너비
+                    let available_height = ui.available_height(); // 사용 가능한 전체 높이
+    
+                    // 고정된 크기의 사이드바
+                    ui.allocate_exact_size(
+                        egui::vec2(sidebar_width, available_height),
+                        egui::Sense::hover(),
+                    );
 
-            if ui.button("Open File").clicked() {
-                self.table_data = file::open_file_to_table();
-            }
+                    if !self.menu.table_data.header.is_empty() {
+                        file::load_data(&self.menu.table_data, ui);
+                    }
 
-            if !self.table_data.header.is_empty() {
-                file::load_data(&self.table_data, ui);
-            }
+                });
+                //side bar separator
+                ui.separator();
+            });
         });
-
     }
 }
