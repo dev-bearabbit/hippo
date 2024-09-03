@@ -38,7 +38,6 @@ impl RecordTable {
             .map(|cell| cell.to_string())
             .collect();
 
-        // 데이터를 추출합니다.
         let mut columns: Vec<Vec<Data>> = vec![Vec::new(); headers.len()];
 
         for row in range.rows().skip(1) { 
@@ -47,7 +46,6 @@ impl RecordTable {
             }
         }
 
-       // Series를 생성합니다.
        let mut series_vec = Vec::with_capacity(headers.len());
 
        for (header, column) in headers.iter().zip(columns) {
@@ -78,11 +76,9 @@ impl RecordTable {
                },
                _ => Series::new(header, column.iter().map(|_| "".to_string()).collect::<Vec<_>>()),
            };
-
            series_vec.push(series);
        }
 
-       // DataFrame을 생성합니다.
        let df = DataFrame::new(series_vec).map_err(TableError::from)?;
 
        Ok(RecordTable { dataframe: df })

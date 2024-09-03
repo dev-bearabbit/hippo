@@ -33,7 +33,6 @@ impl Error for TableError {
     }
 }
 
-// 각 에러 타입에 대한 변환 구현
 impl From<std::io::Error> for TableError {
     fn from(error: std::io::Error) -> Self {
         TableError::Io(error)

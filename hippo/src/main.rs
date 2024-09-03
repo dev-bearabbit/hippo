@@ -1,5 +1,5 @@
 use hippo::apps::menu::Menu;
-use hippo::apps::{file,layout};
+use hippo::apps::{sidebar,layout};
 use eframe::egui;
 
 fn main() -> eframe::Result {
@@ -35,26 +35,7 @@ impl eframe::App for Hippo {
         layout::custom_window_frame(ctx, "Hippo", |ui| {
             self.menu.update_menu_bar(ui);
 
-            ui.horizontal(|ui| {
-                // 사이드바 영역
-                ui.vertical(|ui| {
-                    let sidebar_width = 200.0; // 사이드바의 고정된 너비
-                    let available_height = ui.available_height(); // 사용 가능한 전체 높이
-    
-                    // 고정된 크기의 사이드바
-                    ui.allocate_exact_size(
-                        egui::vec2(sidebar_width, available_height),
-                        egui::Sense::hover(),
-                    );
-
-                    if self.menu.table_data.dataframe.width() != 0 {
-                        file::load_data(&self.menu.table_data, ui);
-                    }
-
-                });
-                //side bar separator
-                ui.separator();
-            });
+            sidebar::custom_sidebar(ui);
         });
     }
 }
