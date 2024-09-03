@@ -1,9 +1,5 @@
-use crate::models::format::Table;
-use crate::apps::file;
 
 pub fn custom_sidebar(ui: &mut egui::Ui) {
-
-    let mut table_data = Table::new();
 
     ui.horizontal(|ui| {
         // 사이드바 영역
@@ -21,11 +17,6 @@ pub fn custom_sidebar(ui: &mut egui::Ui) {
             ui.label("FILE OPEN TEST");
 
             if ui.button("Open File").clicked() {
-                table_data = file::open_file_to_table();
-            }
-
-            if !table_data.header.is_empty() {
-                file::load_data(&table_data, ui);
             }
         });
         //side bar separator

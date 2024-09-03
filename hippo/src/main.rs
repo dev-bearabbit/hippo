@@ -47,7 +47,7 @@ impl eframe::App for Hippo {
                         egui::Sense::hover(),
                     );
 
-                    if !self.menu.table_data.header.is_empty() {
+                    if self.menu.table_data.dataframe.width() != 0 {
                         file::load_data(&self.menu.table_data, ui);
                     }
 
