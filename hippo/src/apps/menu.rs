@@ -14,12 +14,28 @@ impl Menu {
 
             ui.menu_button("File", |ui| {
                 if ui.button("Get CSV").clicked() {
-                    self.table_data = file::open_csv_file_to_table().unwrap();
+                    let file = file::open_csv_file_to_table();
+                    match file {
+                        Ok(data) => {
+                            self.table_data = data;
+                        },
+                        Err(e) => {
+                            println!("Error: {:?}", e);
+                        }
+                    }
                     ui.close_menu();
                 }
             
                 if ui.button("Get Excel").clicked() {
-                    self.table_data = file::open_excel_file_to_table().unwrap();
+                    let file = file::open_excel_file_to_table();
+                    match file {
+                        Ok(data) => {
+                            self.table_data = data;
+                        },
+                        Err(e) => {
+                            println!("Error: {:?}", e);
+                        }
+                    }
                     ui.close_menu();
                 }
             });
