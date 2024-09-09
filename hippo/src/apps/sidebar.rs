@@ -25,8 +25,19 @@ pub fn custom_sidebar(ui: &mut egui::Ui) {
 
                 ui.vertical_centered(|ui| {
                 // 사이드바 내부의 UI 요소
-                    ui.label("Click ");
+                    ui.add_space(5.0);
+                    ui.label(egui::RichText::new("HIPPO").size(24.0).strong());
+                    ui.add_space(10.0);
+                    ui.label("High-Integration Plotting and Processing with Rust");
+                    ui.add_space(10.0);
+                    ui.separator();
 
+                    // 그래프 선택하는 부분
+                    ui.label(egui::RichText::new("Data Visualization").size(15.0).strong());
+                    ui.add_space(10.0);
+                    ui.label("Add a Graph");
+                    ui.add_space(10.0);
+                    
                     // 첫 번째 버튼 (배경색과 크기 조정)
                     if ui.add_sized(
                         egui::vec2(120.0, 30.0), // 버튼 크기
@@ -46,6 +57,16 @@ pub fn custom_sidebar(ui: &mut egui::Ui) {
                     ).clicked() {
                         // 버튼 클릭 시 동작
                         }
+                    
+                    ui.add_space(10.0);
+
+                    // 대시보드 꾸미는 기능 선택하는 부분
+                    ui.separator();
+                    ui.label(egui::RichText::new("Customize Layout").size(15.0).strong());
+                    ui.add_space(10.0);
+                    ui.label("Add a Layout Setting");
+                    ui.add_space(10.0);
+                
                     });
                 });
             });
