@@ -1,4 +1,5 @@
 use hippo::apps::menu::Menu;
+use hippo::apps::dashboard::Dashboard;
 use hippo::apps::{sidebar,layout};
 use eframe::egui;
 
@@ -23,7 +24,8 @@ fn main() -> eframe::Result {
 
 #[derive(Default)]
 struct Hippo {
-    menu: Menu
+    menu: Menu,
+    dashboards: Vec<Dashboard>,
 }
 
 impl eframe::App for Hippo {
@@ -34,8 +36,8 @@ impl eframe::App for Hippo {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {        
         layout::custom_window_frame(ctx, "Hippo", |ui| {
             self.menu.update_menu_bar(ui);
+            sidebar::custom_sidebar(ui, &mut self.dashboards, ctx); // 대시보드 상태 전달
 
-            sidebar::custom_sidebar(ui);
         });
     }
 }

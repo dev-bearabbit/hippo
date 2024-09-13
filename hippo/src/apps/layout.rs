@@ -124,3 +124,4 @@ fn close_maximize_minimize(ui: &mut egui::Ui) {
         ui.ctx().send_viewport_cmd(ViewportCommand::Minimized(true));
     }
 }
+
