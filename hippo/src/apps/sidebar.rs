@@ -1,4 +1,5 @@
 use eframe::egui;
+use crate::models::chart::ChartType;
 use crate::apps::dashboard::Dashboard;
 
 pub fn custom_sidebar(ui: &mut egui::Ui, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
@@ -19,40 +20,44 @@ pub fn custom_sidebar(ui: &mut egui::Ui, dashboards: &mut Vec<Dashboard>, ctx: &
                     ui.separator();
 
                     // 그래프 선택하는 부분
-                    ui.label(egui::RichText::new("Data Visualization").size(15.0).strong());
+                    ui.label(egui::RichText::new("Data Visualization").size(13.0).strong());
                     ui.add_space(10.0);
                     ui.label("Add a Graph");
                     ui.add_space(10.0);
 
-                    // 첫 번째 버튼 (배경색과 크기 조정)
-                    if ui.add_sized(
-                        egui::vec2(120.0, 30.0), // 버튼 크기
-                        egui::Button::new(egui::RichText::new("Table").size(15.0))
-                            .fill(egui::Color32::from_rgb(100, 150, 250)), // 배경색
-                    ).clicked() {
-                        let new_id = dashboards.len(); // 고유 ID로 벡터 길이 사용
-                        dashboards.push(Dashboard::new(new_id)); // 새로운 Dashboard 추가
-                        }
-
+                    // 그래프 추가 버튼
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Line graph", 13.0, dashboards, ChartType::Line);
                     ui.add_space(5.0);
 
-                   // 두 번째 버튼 (배경색과 크기 조정)
-                   if ui.add_sized(
-                    egui::vec2(120.0, 30.0), // 버튼 크기
-                    egui::Button::new(egui::RichText::new("Table 2").size(15.0))
-                        .fill(egui::Color32::from_rgb(50, 100, 200)), // 배경색
-                ).clicked() {
-                    let new_id = dashboards.len(); // 고유 ID로 벡터 길이 사용
-                    dashboards.push(Dashboard::new(new_id)); // 새로운 Dashboard 추가
-                    }
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Bar graph", 13.0, dashboards, ChartType::Bar);
+                    ui.add_space(5.0);
+
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Pie graph", 13.0, dashboards, ChartType::Pie);
+                    ui.add_space(5.0);
+
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Scatter graph", 13.0, dashboards, ChartType::Scatter);
+                    ui.add_space(5.0);
+
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Histogram graph", 13.0, dashboards, ChartType::Histogram);
+                    ui.add_space(5.0);
                 
                 ui.add_space(10.0);
 
                 // 대시보드 꾸미는 기능 선택하는 부분
                 ui.separator();
-                ui.label(egui::RichText::new("Customize Layout").size(15.0).strong());
+                ui.label(egui::RichText::new("Customize Layout").size(13.0).strong());
                 ui.add_space(10.0);
                 ui.label("Add a Layout Setting");
+                ui.add_space(10.0);
+
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Text", 13.0, dashboards, ChartType::Histogram);
+                ui.add_space(5.0);
+
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Image", 13.0, dashboards , ChartType::Histogram);
+                ui.add_space(5.0);
+
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Table", 13.0, dashboards, ChartType::Histogram);
+
                 ui.add_space(10.0);
 
             });
@@ -64,4 +69,31 @@ pub fn custom_sidebar(ui: &mut egui::Ui, dashboards: &mut Vec<Dashboard>, ctx: &
         dashboard.update_dashboard(ctx, ui);
     }
 
+}
+
+fn add_sidebar_dashboard_button(
+        ui: &mut egui::Ui,
+        x:f32,
+        y:f32,
+        text:&str,
+        size:f32,
+        dashboards: &mut Vec<Dashboard>,
+        chart: ChartType) {
+
+    let is_dark_mode = ui.visuals().dark_mode;
+
+    let button_color = if is_dark_mode {
+        egui::Color32::from_rgb(0, 92, 138)
+    } else {
+        egui::Color32::from_rgb(144, 209, 255)
+    };
+
+    if ui.add_sized(
+        egui::vec2(x, y), // 버튼 크기
+        egui::Button::new(egui::RichText::new(text).strong().size(size))
+        .fill(button_color), // 배경색
+    ).clicked() {
+        let new_id = dashboards.len(); // 고유 ID로 벡터 길이 사용
+        dashboards.push(Dashboard::new(new_id, false, chart)); // 새로운 Dashboard 추가
+        };
 }

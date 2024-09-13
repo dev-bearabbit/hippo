@@ -1,15 +1,21 @@
 use eframe::egui;
+use crate::models::chart::ChartType;
+
 pub struct Dashboard {
     pub id: usize,
+    pub resizable: bool,
     pub viewport: bool,
+    pub chart: ChartType,
     pub window_pos: egui::Pos2,
 }
 
 impl Dashboard {
 
-    pub fn new(id: usize) -> Self {
+    pub fn new(id: usize, resizable: bool, chart: ChartType) -> Self {
         Self {
             id,
+            resizable,
+            chart,
             viewport: true,
             window_pos: egui::Pos2::new(500.0, 500.0),
         }
@@ -26,16 +32,18 @@ impl Dashboard {
                 // 창을 표시
                 let window_response = egui::Window::new(format!("Immediate Viewport {}", self.id))
                     .id(egui::Id::new(self.id))
-                    .current_pos(self.window_pos)  // 저장된 위치에 창을 표시
-                    .resizable(true)  // 창 크기 조절 가능
+                    .current_pos(self.window_pos) 
+                    .resizable(self.resizable)
                     .title_bar(false)
                     .enabled(true)
+                    // .frame(egui::Frame::none()) 
                     .show(ctx, |ui| {
-                        ui.label("Hello from immediate viewport");
+
+                        ChartType::execute(&self.chart, ui);
 
                         if ui.button("Close").clicked() {
                             self.viewport = false;
-                        }
+                    }
                     });
 
                 // 창의 위치 제한
