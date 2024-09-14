@@ -1,5 +1,5 @@
 use eframe::egui::ViewportCommand;
-
+use egui::Color32;
 
 pub fn custom_window_frame(ctx: &egui::Context, title: &str, add_contents: impl FnOnce(&mut egui::Ui)) {
     use egui::*;
@@ -99,21 +99,20 @@ fn close_maximize_minimize(ui: &mut egui::Ui) {
         ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
     }
 
-    let is_maximized = ui.input(|i| i.viewport().maximized.unwrap_or(false));
-    if is_maximized {
-        let maximized_response = ui
+    let is_fullscreen = ui.input(|i| i.viewport().fullscreen.unwrap_or(false));
+    if is_fullscreen {
+        let fullscreen_response = ui
             .add(Button::new(RichText::new("🗗").size(button_height)))
             .on_hover_text("Restore window");
-        if maximized_response.clicked() {
-            ui.ctx()
-                .send_viewport_cmd(ViewportCommand::Maximized(false));
+        if fullscreen_response.clicked() {
+            toggle_fullscreen(ui);
         }
     } else {
-        let maximized_response = ui
+        let fullscreen_response = ui
             .add(Button::new(RichText::new("🗗").size(button_height)))
-            .on_hover_text("Maximize window");
-        if maximized_response.clicked() {
-            ui.ctx().send_viewport_cmd(ViewportCommand::Maximized(true));
+            .on_hover_text("Fullscreen window");
+        if fullscreen_response.clicked() {
+            toggle_fullscreen(ui);
         }
     }
 
@@ -125,3 +124,11 @@ fn close_maximize_minimize(ui: &mut egui::Ui) {
     }
 }
 
+fn toggle_fullscreen(ui: &mut egui::Ui) {
+    let is_fullscreen = ui.input(|i| i.viewport().fullscreen.unwrap_or(false));
+    if is_fullscreen {
+        ui.ctx().send_viewport_cmd(ViewportCommand::Fullscreen(false));
+    } else {
+        ui.ctx().send_viewport_cmd(ViewportCommand::Fullscreen(true));
+    }
+}
