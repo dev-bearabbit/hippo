@@ -30,7 +30,7 @@ impl Dashboard {
                 let central_panel_rect = ui.max_rect();
 
                 // 창을 표시
-                let window_response = egui::Window::new(format!("Immediate Viewport {}", self.id))
+                let window_response = egui::Window::new(format!("chart {}", self.id))
                     .id(egui::Id::new(self.id))
                     .current_pos(self.window_pos) 
                     .resizable(self.resizable)

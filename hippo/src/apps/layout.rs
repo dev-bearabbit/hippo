@@ -1,5 +1,4 @@
 use eframe::egui::ViewportCommand;
-use egui::Color32;
 
 pub fn custom_window_frame(ctx: &egui::Context, title: &str, add_contents: impl FnOnce(&mut egui::Ui)) {
     use egui::*;

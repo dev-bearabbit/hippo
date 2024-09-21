@@ -13,7 +13,8 @@ impl Menu {
         ui.horizontal(|ui| {
 
             ui.menu_button("File", |ui| {
-                if ui.button("Get CSV").clicked() {
+
+                if ui.button("Get CSV File").clicked() {
                     let file = file::open_csv_file_to_table();
                     match file {
                         Ok(data) => {
@@ -26,7 +27,7 @@ impl Menu {
                     ui.close_menu();
                 }
             
-                if ui.button("Get Excel").clicked() {
+                if ui.button("Get Excel File").clicked() {
                     let file = file::open_excel_file_to_table();
                     match file {
                         Ok(data) => {

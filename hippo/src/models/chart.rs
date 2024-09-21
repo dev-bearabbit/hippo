@@ -1,4 +1,6 @@
 use eframe::egui;
+use polars::prelude::*;
+use plotters::prelude::*;
 
 pub enum ChartType {
     Line,
@@ -26,7 +28,7 @@ impl ChartType {
         .show(ui, |ui| {
 
             ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
-            ui.add_space(5.0);
+            ui.add_space(10.0);
 
             ui.horizontal(|ui| {
                 ui.label(egui::RichText::new("This is Line Chart").size(15.0));

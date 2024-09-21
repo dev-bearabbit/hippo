@@ -1,8 +1,10 @@
 use eframe::egui;
 use crate::models::chart::ChartType;
 use crate::apps::dashboard::Dashboard;
+use crate::apps::custom;
+use crate::models::table::RecordTable;
 
-pub fn custom_sidebar(ui: &mut egui::Ui, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
+pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
 
     egui::SidePanel::left("sidebar")
     .resizable(true)
@@ -16,6 +18,16 @@ pub fn custom_sidebar(ui: &mut egui::Ui, dashboards: &mut Vec<Dashboard>, ctx: &
                     ui.label(egui::RichText::new("HIPPO").size(24.0).strong());
                     ui.add_space(10.0);
                     ui.label("High-Integration Plotting and Processing with Rust");
+                    ui.add_space(10.0);
+                    ui.separator();
+
+                    // column 목록 확인 파트
+                    ui.label(egui::RichText::new("Column List").size(13.0).strong());
+                    ui.add_space(10.0);
+
+                    let col_names = table_data.dataframe.get_column_names();
+                    custom::get_column_list(ui, col_names);
+
                     ui.add_space(10.0);
                     ui.separator();
 
