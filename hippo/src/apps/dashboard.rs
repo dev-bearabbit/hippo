@@ -1,5 +1,6 @@
 use eframe::egui;
 use crate::models::chart::ChartType;
+use crate::models::table::RecordTable;
 
 pub struct Dashboard {
     pub id: usize,
@@ -21,7 +22,7 @@ impl Dashboard {
         }
     }
 
-    pub fn update_dashboard(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
+    pub fn update_dashboard(&mut self, ctx: &egui::Context, ui: &mut egui::Ui, table_data: &RecordTable) {
 
         egui::CentralPanel::default().show_inside(ui, |ui| {
 
@@ -36,10 +37,11 @@ impl Dashboard {
                     .resizable(self.resizable)
                     .title_bar(false)
                     .enabled(true)
+                    .max_size(egui::vec2(400.0, 300.0))
                     // .frame(egui::Frame::none()) 
                     .show(ctx, |ui| {
-
-                        ChartType::execute(&self.chart, ui);
+                    
+                        ChartType::execute(&self.chart, ctx, ui, table_data);
 
                         if ui.button("Close").clicked() {
                             self.viewport = false;

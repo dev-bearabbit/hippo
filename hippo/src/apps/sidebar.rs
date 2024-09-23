@@ -78,7 +78,7 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
 
     // 저장된 모든 대시보드 업데이트 호출
     for dashboard in dashboards.iter_mut() {
-        dashboard.update_dashboard(ctx, ui);
+        dashboard.update_dashboard(ctx, ui, &table_data);
     }
 
 }
