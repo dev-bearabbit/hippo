@@ -27,8 +27,17 @@ impl ChartType {
         .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
         .show(ui, |ui| {
 
+
             ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
             ui.add_space(5.0);
+
+            let col_cnt = table_data.dataframe.get_column_names().len();
+            if col_cnt == 0 {
+                ui.label(egui::RichText::new("Not Found Data. Plase Import Csv or Excel File").size(15.0));
+            } else {
+                ui.label(egui::RichText::new(table_data.dataframe.get_column_names().concat()).size(15.0));
+            }
+
             ui.label(egui::RichText::new(table_data.dataframe.get_column_names().concat()).size(15.0));
             ui.add_space(5.0);
             ui.separator();
