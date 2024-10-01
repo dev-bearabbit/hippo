@@ -35,7 +35,7 @@ impl eframe::App for Hippo {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {        
         layout::custom_window_frame(ctx, "Hippo", |ui| {
-            self.menu.update_menu_bar(ui);
+            self.menu.update_menu_bar(ui, ctx);
             sidebar::custom_sidebar(ui, self.menu.table_data.clone(), &mut self.dashboards, ctx); // 대시보드 상태 전달
 
         });

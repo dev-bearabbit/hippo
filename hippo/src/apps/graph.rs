@@ -15,7 +15,7 @@ impl Graph {
         }
     }
 
-    pub fn draw_line_chart(&mut self, ctx: &egui::Context, ui: &mut egui::Ui) {
+    pub fn draw_line_chart(&mut self, ctx: &egui::Context, ui: &mut egui::Ui, table_data: &RecordTable) {
 
             ui.heading("Plotters Line Chart Example");
 
@@ -51,8 +51,8 @@ fn draw_line_chart_to_memory() -> Result<(Vec<u8>, u32, u32), Box<dyn std::error
     let mut chart = ChartBuilder::on(&root)
         .caption("Line Chart", ("sans-serif", 50))
         .margin(10)
-        .x_label_area_size(30)
-        .y_label_area_size(30)
+        .x_label_area_size(3)
+        .y_label_area_size(300)
         .build_cartesian_2d(0..10, 0..100)?;
 
     chart.configure_mesh().draw()?;

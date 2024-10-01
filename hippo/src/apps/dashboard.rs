@@ -18,7 +18,7 @@ impl Dashboard {
             resizable,
             chart,
             viewport: true,
-            window_pos: egui::Pos2::new(500.0, 500.0),
+            window_pos: egui::Pos2::new(400.0, 200.0)
         }
     }
 

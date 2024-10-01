@@ -33,15 +33,16 @@ impl ChartType {
 
             let col_cnt = table_data.dataframe.get_column_names().len();
             if col_cnt == 0 {
-                ui.label(egui::RichText::new("Not Found Data. Plase Import Csv or Excel File").size(15.0));
+                ui.label(egui::RichText::new("Not Found Data.").size(15.0));
+                ui.add_space(5.0);
+                ui.label(egui::RichText::new("please Import CSV or Excel File").size(15.0));
             } else {
                 ui.label(egui::RichText::new(table_data.dataframe.get_column_names().concat()).size(15.0));
             }
 
-            ui.label(egui::RichText::new(table_data.dataframe.get_column_names().concat()).size(15.0));
             ui.add_space(5.0);
             ui.separator();
-            Graph::new().draw_line_chart(ctx, ui);
+            Graph::new().draw_line_chart(ctx, ui, table_data);
         
         });
     }
