@@ -1,73 +1,49 @@
-use plotters::prelude::*;
-use plotters_bitmap::BitMapBackend;
-use image::{ImageBuffer, Rgba};
-use eframe::egui::TextureHandle;
+use egui_plot::{Line, Plot, PlotPoints};
+use crate::models::table::RecordTable;
+use crate::apps::custom;
 
 pub struct Graph {
-    texture: Option<TextureHandle>,
 }
 
 impl Graph {
-
     pub fn new() -> Self {
         Self {
-            texture: None
         }
     }
 
-    pub fn draw_line_chart(&mut self, ctx: &egui::Context, ui: &mut egui::Ui, table_data: &RecordTable) {
+    pub fn draw_line_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable) {
 
-            ui.heading("Plotters Line Chart Example");
+        egui::Frame::default()
+        .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
+        .show(ui, |ui| {
 
-            if self.texture.is_none() {
-                // plotter 모듈의 함수를 호출하여 메모리 내에서 이미지 생성
-                let (image, width, height) = draw_line_chart_to_memory().expect("Failed to draw line chart");
+            ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
+            ui.add_space(5.0);
 
-                // 이미지 데이터를 egui의 Texture로 변환
-                let size = [width as usize, height as usize];
-                let color_image = egui::ColorImage::from_rgba_unmultiplied(size, &image);
-                let texture = ctx.load_texture("plotters_image", color_image, egui::TextureOptions::default());
-                self.texture = Some(texture);
+            let col_cnt = table_data.dataframe.get_column_names().len();
+            if col_cnt == 0 {
+                self._check_data_exist(ui);
+            } else {
+                ui.label(egui::RichText::new("TEST").size(15.0));
+                custom::select_column_dropbox(ui, table_data.dataframe.get_column_names())
             }
+            ui.add_space(5.0);
+            ui.separator();
+        
+            let line_points = PlotPoints::from_explicit_callback(|x| x.sin(), -std::f64::consts::PI..std::f64::consts::PI, 100);
+            let line = Line::new(line_points);
 
-            if let Some(texture) = &self.texture {
-                // egui 창에 이미지 그리기
-                ui.image(texture);
-            };
-    }
-}
-
-// 메모리 상에서 이미지로 그리기
-fn draw_line_chart_to_memory() -> Result<(Vec<u8>, u32, u32), Box<dyn std::error::Error>> {
-    let width = 500;
-    let height = 300;
-
-    // 1. 메모리 버퍼에 직접 그리기
-    let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = ImageBuffer::new(width, height);
-    {
-    let root = BitMapBackend::with_buffer(&mut buffer, (width, height)).into_drawing_area();
-    root.fill(&WHITE)?;
-
-    let mut chart = ChartBuilder::on(&root)
-        .caption("Line Chart", ("sans-serif", 50))
-        .margin(10)
-        .x_label_area_size(3)
-        .y_label_area_size(300)
-        .build_cartesian_2d(0..10, 0..100)?;
-
-    chart.configure_mesh().draw()?;
-
-    chart.draw_series(LineSeries::new(
-        (0..10).map(|x| (x, x * x)),
-        &RED,
-    ))?;
-
-    root.present()?;
+            Plot::new("example_plot")
+                .view_aspect(2.0) // 그래프의 가로 세로 비율 설정
+                .show(ui, |plot_ui| {
+                    plot_ui.line(line);
+                });
+        });
     }
 
-    // 2. 버퍼에서 이미지 데이터를 Vec<u8>로 변환
-    let raw_image_data = buffer.into_raw();
-
-    // 3. 이미지 데이터와 크기 반환
-    Ok((raw_image_data, width, height))
+    fn _check_data_exist(&mut self, ui: &mut egui::Ui) {
+        ui.label(egui::RichText::new("Not Found Data.").size(15.0));
+        ui.add_space(5.0);
+        ui.label(egui::RichText::new("please Import CSV or Excel File").size(15.0));
+    }
 }

@@ -4,15 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_derive = "1.0"
-native-dialog = "0.5"
-eframe = "0.28.1"
-egui = "0.28.1"
+eframe = "0.29.1"
+egui = "0.29.1"
 env_logger = "0.11.5"
 rfd = "0.14.1"
 calamine = "0.25.0"
 polars = "0.42.0"
-plotters = "0.3.7"
-image = "0.25.2"
-plotters-bitmap = "0.3.7"
+egui_plot = "0.29.0"

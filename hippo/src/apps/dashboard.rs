@@ -18,7 +18,7 @@ impl Dashboard {
             resizable,
             chart,
             viewport: true,
-            window_pos: egui::Pos2::new(400.0, 200.0)
+            window_pos: egui::Pos2::new(300.0, 200.0)
         }
     }
 
@@ -37,11 +37,12 @@ impl Dashboard {
                     .resizable(self.resizable)
                     .title_bar(false)
                     .enabled(true)
-                    .max_size(egui::vec2(400.0, 300.0))
+                    .min_size(egui::vec2(600.0, 400.0))
+                    .max_size(egui::vec2(600.0, 400.0))
                     // .frame(egui::Frame::none()) 
                     .show(ctx, |ui| {
                     
-                        ChartType::execute(&self.chart, ctx, ui, table_data);
+                        ChartType::execute(&self.chart, ui, table_data);
 
                         if ui.button("Close").clicked() {
                             self.viewport = false;

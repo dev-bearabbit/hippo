@@ -85,7 +85,7 @@ impl Menu {
     fn theme_light_dark_mode(&mut self, ui: &mut egui::Ui) {
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            egui::widgets::global_dark_light_mode_buttons(ui);
+            egui::widgets::global_theme_preference_buttons(ui);
         });
     }
 
