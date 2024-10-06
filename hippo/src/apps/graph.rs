@@ -29,17 +29,30 @@ impl Graph {
             }
             ui.add_space(5.0);
             ui.separator();
-        
-            let line_points = PlotPoints::from_explicit_callback(|x| x.sin(), -std::f64::consts::PI..std::f64::consts::PI, 100);
-            let line = Line::new(line_points);
+            ui.add_space(5.0);
 
-            Plot::new("example_plot")
-                .view_aspect(2.0) // 그래프의 가로 세로 비율 설정
-                .show(ui, |plot_ui| {
-                    plot_ui.line(line);
-                });
+            self.set_line_chart(ui, table_data);
+
         });
     }
+
+    pub fn set_line_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable) {
+
+        egui::Frame::default()
+        .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
+        .show(ui, |ui| {
+
+        let line_points = PlotPoints::from_explicit_callback(|x| x.sin(), -std::f64::consts::PI..std::f64::consts::PI, 100);
+        let line = Line::new(line_points);
+
+        Plot::new("example_plot")
+            .view_aspect(2.0) // 그래프의 가로 세로 비율 설정
+            .show(ui, |plot_ui| {
+                plot_ui.line(line);
+            });
+        });
+    }
+
 
     fn _check_data_exist(&mut self, ui: &mut egui::Ui) {
         ui.label(egui::RichText::new("Not Found Data.").size(15.0));

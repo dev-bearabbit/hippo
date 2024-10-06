@@ -12,9 +12,9 @@ pub enum ChartType {
 
 // 차트 타입에 따른 로직을 처리하는 함수
 impl ChartType {
-    pub fn execute(&self, ui: &mut egui::Ui, table_data: &RecordTable) {
+    pub fn execute(&self, ui: &mut egui::Ui, table_data: &RecordTable, edit_mode: bool) {
         match self {
-            ChartType::Line => self.render_line_chart(ui, table_data),
+            ChartType::Line => self.render_line_chart(ui, table_data, edit_mode),
             ChartType::Bar => self.render_bar_chart(ui),
             ChartType::Pie => self.render_pie_chart(ui),
             ChartType::Scatter => self.render_scatter_chart(ui),
@@ -22,8 +22,12 @@ impl ChartType {
         }
     }
 
-    fn render_line_chart(&self, ui: &mut egui::Ui, table_data: &RecordTable) {
+    fn render_line_chart(&self, ui: &mut egui::Ui, table_data: &RecordTable, edit_mode: bool) {
+        if edit_mode {
             Graph::new().draw_line_chart(ui, table_data);
+        } else {
+            Graph::new().set_line_chart(ui, table_data);
+        }
     }
 
     fn render_bar_chart(&self, ui: &mut egui::Ui) {
