@@ -48,7 +48,7 @@ impl Menu {
                 if ui.button("Export Raw File").clicked() {
                     ui.close_menu();
                 }
-                if ui.button("Export as PDF").clicked() {
+                if ui.button("Export as JPG").clicked() {
                     ui.close_menu();
                 }
             });
