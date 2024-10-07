@@ -1,42 +1,26 @@
+pub struct Custom {
+    text: String,
 
-pub fn get_column_list(ui: &mut egui::Ui, column_list: Vec<&str>) {
-
-    let text_style = egui::TextStyle::Body;
-    let row_height = ui.text_style_height(&text_style);
-    let num_rows = column_list.len();
-
-    if num_rows == 0 {
-        egui::ScrollArea::vertical().auto_shrink([false; 2])
-        .max_height(50.0)
-        .show(
-            ui,
-            |ui| {
-                ui.label("Not Found Data");
-            }
-        );
-    } else {
-        egui::ScrollArea::vertical().auto_shrink([false; 2])
-        .max_height(50.0)
-        .show_rows(
-            ui,
-            row_height,
-            num_rows,
-            |ui, row_range| {
-                for row in row_range {
-                    ui.label(column_list[row]);
-                }
-            },
-        );
-    }
 }
 
-pub fn select_column_dropbox(ui: &mut egui::Ui, columns: Vec<&str>) {
+impl Custom {
 
-    let mut selected = 1;
-    egui::ComboBox::from_label("Select one!").show_index(
-        ui,
-        &mut selected,
-        columns.len(),
-        |i| columns[i]
-    );
+    pub fn new() -> Self {
+        Self {
+            text: String::new(),
+        }
+    }
+
+    pub fn set_up_text_layout(&mut self, ui: &mut egui::Ui) {
+
+        egui::Frame::default()
+        .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
+        .show(ui, |ui| {
+
+            ui.label(egui::RichText::new("Write Text").size(20.0).strong());
+            ui.add_space(5.0);
+            ui.text_edit_singleline(&mut self.text);
+
+        });
+    }
 }

@@ -5,3 +5,4 @@ pub mod sidebar;
 pub mod dashboard;
 pub mod custom;
 pub mod graph;
+pub mod util;

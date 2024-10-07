@@ -1,7 +1,7 @@
 use eframe::egui;
 use crate::models::chart::ChartType;
 use crate::apps::dashboard::Dashboard;
-use crate::apps::custom;
+use crate::apps::util;
 use crate::models::table::RecordTable;
 
 pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
@@ -26,7 +26,7 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                     ui.add_space(10.0);
 
                     let col_names = table_data.dataframe.get_column_names();
-                    custom::get_column_list(ui, col_names);
+                    util::get_column_list(ui, col_names);
 
                     ui.add_space(10.0);
                     ui.separator();
@@ -62,13 +62,13 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                 ui.label("Add a Layout Setting");
                 ui.add_space(10.0);
 
-                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Text", 13.0, dashboards, ChartType::Histogram);
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Text", 13.0, dashboards, ChartType::Text);
                 ui.add_space(5.0);
 
-                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Image", 13.0, dashboards , ChartType::Histogram);
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Image", 13.0, dashboards , ChartType::Image);
                 ui.add_space(5.0);
 
-                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Table", 13.0, dashboards, ChartType::Histogram);
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Table", 13.0, dashboards, ChartType::Table);
 
                 ui.add_space(10.0);
 

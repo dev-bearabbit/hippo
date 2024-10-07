@@ -1,6 +1,8 @@
 use eframe::egui;
 use crate::models::chart::ChartType;
 use crate::models::table::RecordTable;
+use crate::apps::graph::Graph;
+use crate::apps::custom::Custom;
 
 pub struct Dashboard {
     pub id: usize,
@@ -10,6 +12,8 @@ pub struct Dashboard {
     pub open: bool,
     pub chart: ChartType,
     pub window_pos: egui::Pos2,
+    pub custom: Custom,
+    pub graph: Graph
 }
 
 impl Dashboard {
@@ -22,7 +26,9 @@ impl Dashboard {
             viewport: true,
             save: false,
             open: true,
-            window_pos: egui::Pos2::new(300.0, 200.0)
+            window_pos: egui::Pos2::new(300.0, 200.0),
+            custom: Custom::new(),
+            graph: Graph::new()
         }
     }
 
@@ -42,14 +48,14 @@ impl Dashboard {
                     .max_size(egui::vec2(600.0, 400.0))
                     .show(ctx, |ui| {
 
-                        ChartType::execute(&self.chart, ui, table_data, true);
+                        ChartType::execute(&self.chart, ui, &mut self.custom, &mut self.graph, table_data, true);
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.horizontal(|ui| {
                                 if ui.button("Close").clicked() {
                                     self.viewport = false;
                                 }
-                                if ui.button("Save").clicked() {
+                                if ui.button("Confirm").clicked() {
                                     self.save = true;
                                     self.viewport = false;
                                 } 
@@ -73,6 +79,7 @@ impl Dashboard {
                     .collapsible(false)
                     .open(&mut self.open)
                     .enabled(true)
+                    .max_size(ui.max_rect().size())
                     .frame(egui::Frame {
                         shadow: egui::Shadow::NONE,
                         stroke: egui::Stroke::new(1.0 ,egui::Color32::GRAY),
@@ -80,12 +87,12 @@ impl Dashboard {
                         ..Default::default()
                     })
                     .show(ctx, |ui| {
-                        ChartType::execute(&self.chart, ui, table_data, false);
+
+                        ChartType::execute(&self.chart, ui, &mut self.custom, &mut self.graph, table_data, false);
                     });
 
                 // CentralPanel의 경계를 가져옴
-                let central_panel_rect = ui.max_rect();
-                self._restrict_graph_area(central_panel_rect, window_response);
+                self._restrict_graph_area(ui.max_rect(), window_response);
             }
 
         });

@@ -1,6 +1,6 @@
 use egui_plot::{Line, Plot, PlotPoints};
 use crate::models::table::RecordTable;
-use crate::apps::custom;
+use crate::apps::util;
 
 pub struct Graph {
 }
@@ -25,7 +25,7 @@ impl Graph {
                 self._check_data_exist(ui);
             } else {
                 ui.label(egui::RichText::new("TEST").size(15.0));
-                custom::select_column_dropbox(ui, table_data.dataframe.get_column_names())
+                util::select_column_dropbox(ui, table_data.dataframe.get_column_names())
             }
             ui.add_space(5.0);
             ui.separator();
