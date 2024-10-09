@@ -6,3 +6,4 @@ pub mod dashboard;
 pub mod custom;
 pub mod graph;
 pub mod util;
+pub mod font;

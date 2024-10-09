@@ -3,6 +3,7 @@ use crate::apps::graph::Graph;
 use crate::apps::custom::Custom;
 use crate::models::table::RecordTable;
 
+#[derive(PartialEq)]
 pub enum ChartType {
     Line,
     Bar,
@@ -89,7 +90,7 @@ impl ChartType {
         if edit_mode {
             custom.set_up_text_layout(ui);
         } else {
-            custom.set_up_text_layout(ui);
+            custom.result_text(ui);
         }
     }
 

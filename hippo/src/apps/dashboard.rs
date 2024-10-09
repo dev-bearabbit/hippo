@@ -71,7 +71,7 @@ impl Dashboard {
             if self.save {
                 // 창을 표시
                 let chart_id = format!("chart {}", self.id);
-                let window_response = egui::Window::new(&chart_id)
+                let window_response = egui::Window::new("")
                     .id(egui::Id::new(&chart_id))
                     .current_pos(self.window_pos) 
                     .resizable(true)

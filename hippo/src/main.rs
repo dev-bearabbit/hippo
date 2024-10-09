@@ -1,4 +1,5 @@
 use hippo::apps::menu::Menu;
+use hippo::apps::font::configure_hangul_fonts;
 use hippo::apps::dashboard::Dashboard;
 use hippo::apps::{sidebar,layout};
 use eframe::egui;
@@ -18,7 +19,10 @@ fn main() -> eframe::Result {
     eframe::run_native(
         "Hippo",
         options,
-        Box::new(|_cc| Ok(Box::<Hippo>::default())),
+        Box::new(|_cc| {
+            configure_hangul_fonts(&_cc.egui_ctx);
+            Ok(Box::<Hippo>::default())
+        }),
     )
 }
 
