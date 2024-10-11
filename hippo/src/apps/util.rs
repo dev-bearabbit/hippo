@@ -29,14 +29,3 @@ pub fn get_column_list(ui: &mut egui::Ui, column_list: Vec<&str>) {
         );
     }
 }
-
-pub fn select_column_dropbox(ui: &mut egui::Ui, columns: Vec<&str>) {
-
-    let mut selected = 1;
-    egui::ComboBox::from_label("Select one!").show_index(
-        ui,
-        &mut selected,
-        columns.len(),
-        |i| columns[i]
-    );
-}

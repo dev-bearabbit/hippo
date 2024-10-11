@@ -1,13 +1,15 @@
 use egui_plot::{Line, Plot, PlotPoints};
 use crate::models::table::RecordTable;
-use crate::apps::util;
 
 pub struct Graph {
+    id: usize
 }
 
+
 impl Graph {
-    pub fn new() -> Self {
+    pub fn new(id: usize) -> Self {
         Self {
+            id
         }
     }
 
@@ -24,8 +26,10 @@ impl Graph {
             if col_cnt == 0 {
                 self._check_data_exist(ui);
             } else {
-                ui.label(egui::RichText::new("TEST").size(15.0));
-                util::select_column_dropbox(ui, table_data.dataframe.get_column_names())
+                ui.label(egui::RichText::new("X axis").size(15.0));
+                self._select_column_dropbox(ui, table_data.dataframe.get_column_names());
+                ui.label(egui::RichText::new("Y axis").size(15.0));
+                self._select_column_dropbox(ui, table_data.dataframe.get_column_names());
             }
             ui.add_space(5.0);
             ui.separator();
@@ -51,6 +55,17 @@ impl Graph {
                 plot_ui.line(line);
             });
         });
+    }
+
+    fn _select_column_dropbox(&mut self, ui: &mut egui::Ui, columns: Vec<&str>) {
+
+        let mut selected = 1;
+        egui::ComboBox::from_label(format!("dropbox")).show_index(
+            ui,
+            &mut selected,
+            columns.len(),
+            |i| columns[i]
+        );
     }
 
 

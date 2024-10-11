@@ -28,7 +28,7 @@ impl Dashboard {
             open: true,
             window_pos: egui::Pos2::new(300.0, 200.0),
             custom: Custom::new(),
-            graph: Graph::new()
+            graph: Graph::new(id)
         }
     }
 
