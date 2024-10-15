@@ -1,53 +1,34 @@
 use eframe::egui;
-use crate::apps::graph::Graph;
-use crate::apps::custom::Custom;
+use crate::apps::graph::line::LineGraph;
+use crate::apps::graph::bar::BarGraph;
+use crate::apps::custom::text::TextCustom;
 use crate::models::table::RecordTable;
 
-#[derive(PartialEq)]
+
 pub enum ChartType {
-    Line,
-    Bar,
+    Line(LineGraph),
+    Bar(BarGraph),
     Pie,
     Scatter,
     Histogram,
-    Text,
+    Text(TextCustom ),
     Image,
     Table
 }
 
 // 차트 타입에 따른 로직을 처리하는 함수
 impl ChartType {
-    pub fn execute(&self, ui: &mut egui::Ui, custom :&mut Custom, graph:&mut Graph, table_data: &RecordTable, edit_mode: bool) {
+    pub fn execute(&mut self, ui: &mut egui::Ui, table_data: &RecordTable, edit_mode: bool) {
         match self {
-            ChartType::Line => self.render_line_chart(ui, graph, table_data, edit_mode),
-            ChartType::Bar => self.render_bar_chart(ui),
+            ChartType::Line(graph) => graph.draw_line_chart(ui, table_data, edit_mode),
+            ChartType::Bar(graph) => graph.draw_bar_chart(ui, table_data, edit_mode),
             ChartType::Pie => self.render_pie_chart(ui),
             ChartType::Scatter => self.render_scatter_chart(ui),
             ChartType::Histogram => self.render_histogram_chart(ui),
-            ChartType::Text => self.render_text_layout(ui, custom, edit_mode),
+            ChartType::Text(graph) => graph.set_up_text_layout(ui, edit_mode),
             ChartType::Image => self.render_image_layout(ui),
             ChartType::Table => self.render_table_layout(ui),
         }
-    }
-
-    fn render_line_chart(&self, ui: &mut egui::Ui, graph: &mut Graph, table_data: &RecordTable, edit_mode: bool) {
-        if edit_mode {
-            graph.draw_line_chart(ui, table_data);
-        } else {
-            graph.set_line_chart(ui, table_data);
-        }
-    }
-
-    fn render_bar_chart(&self, ui: &mut egui::Ui) {
-        egui::Frame::default()
-        .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
-        .show(ui, |ui| {
-
-            ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
-            ui.add_space(5.0);
-            ui.label(egui::RichText::new("This is Bar Chart").size(15.0));
- 
-        });
     }
 
     fn render_pie_chart(&self, ui: &mut egui::Ui) {
@@ -84,14 +65,6 @@ impl ChartType {
             ui.label(egui::RichText::new("This is Histogram Chart").size(15.0));
  
         });
-    }
-
-    fn render_text_layout(&self, ui: &mut egui::Ui, custom: &mut Custom, edit_mode: bool) {
-        if edit_mode {
-            custom.set_up_text_layout(ui);
-        } else {
-            custom.result_text(ui);
-        }
     }
 
     fn render_image_layout(&self, ui: &mut egui::Ui) {

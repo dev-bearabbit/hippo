@@ -1,31 +1,24 @@
+pub struct Dropbox {
+    pub id: usize,
+    pub selected: usize,
+}
 
-pub fn get_column_list(ui: &mut egui::Ui, column_list: Vec<&str>) {
+impl Dropbox {
+    pub fn new(id: usize) -> Self {
+        Self {
+            id: id,
+            selected: 0,
+        }
+    }
 
-    let text_style = egui::TextStyle::Body;
-    let row_height = ui.text_style_height(&text_style);
-    let num_rows = column_list.len();
+    pub fn select_column_dropbox(&mut self, ui: &mut egui::Ui, columns: &Vec<&str>) {
 
-    if num_rows == 0 {
-        egui::ScrollArea::vertical().auto_shrink([false; 2])
-        .max_height(50.0)
-        .show(
-            ui,
-            |ui| {
-                ui.label("Not Found Data");
-            }
-        );
-    } else {
-        egui::ScrollArea::vertical().auto_shrink([false; 2])
-        .max_height(50.0)
-        .show_rows(
-            ui,
-            row_height,
-            num_rows,
-            |ui, row_range| {
-                for row in row_range {
-                    ui.label(column_list[row]);
+        egui::ComboBox::new(self.id, "")
+            .selected_text(columns[self.selected])
+            .show_ui(ui, |ui| {
+                for (i, &column) in columns.iter().enumerate() {
+                    ui.selectable_value(&mut self.selected, i, column);
                 }
-            },
-        );
+            });
     }
 }

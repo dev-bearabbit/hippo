@@ -1,8 +1,11 @@
 use eframe::egui;
 use crate::models::chart::ChartType;
 use crate::apps::dashboard::Dashboard;
-use crate::apps::util;
 use crate::models::table::RecordTable;
+
+use super::graph::bar::BarGraph;
+use super::graph::line::LineGraph;
+use super::custom::text::TextCustom;
 
 pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
 
@@ -26,7 +29,7 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                     ui.add_space(10.0);
 
                     let col_names = table_data.dataframe.get_column_names();
-                    util::get_column_list(ui, col_names);
+                    get_column_list(ui, col_names);
 
                     ui.add_space(10.0);
                     ui.separator();
@@ -38,10 +41,10 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                     ui.add_space(10.0);
 
                     // 그래프 추가 버튼
-                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Line graph", 13.0, dashboards, ChartType::Line);
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Line graph", 13.0, dashboards, ChartType::Line(LineGraph::new()));
                     ui.add_space(5.0);
 
-                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Bar graph", 13.0, dashboards, ChartType::Bar);
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Bar graph", 13.0, dashboards, ChartType::Bar(BarGraph::new()));
                     ui.add_space(5.0);
 
                     add_sidebar_dashboard_button(ui, 110.0, 30.0, "Pie graph", 13.0, dashboards, ChartType::Pie);
@@ -62,7 +65,7 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                 ui.label("Add a Layout Setting");
                 ui.add_space(10.0);
 
-                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Text", 13.0, dashboards, ChartType::Text);
+                add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Text", 13.0, dashboards, ChartType::Text(TextCustom::new()));
                 ui.add_space(5.0);
 
                 add_sidebar_dashboard_button(ui, 110.0, 30.0, "Add a Image", 13.0, dashboards , ChartType::Image);
@@ -109,3 +112,35 @@ fn add_sidebar_dashboard_button(
         dashboards.push(Dashboard::new(new_id, false, chart)); // 새로운 Dashboard 추가
         };
 }
+
+fn get_column_list(ui: &mut egui::Ui, column_list: Vec<&str>) {
+
+    let text_style = egui::TextStyle::Body;
+    let row_height = ui.text_style_height(&text_style);
+    let num_rows = column_list.len();
+
+    if num_rows == 0 {
+        egui::ScrollArea::vertical().auto_shrink([false; 2])
+        .max_height(50.0)
+        .show(
+            ui,
+            |ui| {
+                ui.label("Not Found Data");
+            }
+        );
+    } else {
+        egui::ScrollArea::vertical().auto_shrink([false; 2])
+        .max_height(50.0)
+        .show_rows(
+            ui,
+            row_height,
+            num_rows,
+            |ui, row_range| {
+                for row in row_range {
+                    ui.label(column_list[row]);
+                }
+            },
+        );
+    }
+}
+
