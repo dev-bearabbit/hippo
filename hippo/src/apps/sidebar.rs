@@ -5,6 +5,7 @@ use crate::models::table::RecordTable;
 
 use super::graph::bar::BarGraph;
 use super::graph::line::LineGraph;
+use super::graph::scatter::ScatterGraph;
 use super::custom::text::TextCustom;
 
 pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
@@ -50,7 +51,7 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                     add_sidebar_dashboard_button(ui, 110.0, 30.0, "Pie graph", 13.0, dashboards, ChartType::Pie);
                     ui.add_space(5.0);
 
-                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Scatter graph", 13.0, dashboards, ChartType::Scatter);
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Scatter graph", 13.0, dashboards, ChartType::Scatter(ScatterGraph::new()));
                     ui.add_space(5.0);
 
                     add_sidebar_dashboard_button(ui, 110.0, 30.0, "Histogram graph", 13.0, dashboards, ChartType::Histogram);

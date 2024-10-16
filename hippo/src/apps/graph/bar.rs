@@ -33,11 +33,13 @@ impl BarGraph {
                 } else {
                     columns.insert(0, "select");
 
-                    ui.label(egui::RichText::new("X axis").size(15.0));
-                    self.x_axis.select_column_dropbox(ui, &columns);
+                    ui.horizontal(|ui| { 
+                        ui.label(egui::RichText::new("X axis").size(15.0));
+                        self.x_axis.select_column_dropbox(ui, &columns);
 
-                    ui.label(egui::RichText::new("Y axis").size(15.0));
-                    self.y_axis.select_column_dropbox(ui, &columns);
+                        ui.label(egui::RichText::new("Y axis").size(15.0));
+                        self.y_axis.select_column_dropbox(ui, &columns);
+                    });
                 }
                 ui.add_space(5.0);
                 ui.separator();

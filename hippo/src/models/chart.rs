@@ -1,6 +1,7 @@
 use eframe::egui;
 use crate::apps::graph::line::LineGraph;
 use crate::apps::graph::bar::BarGraph;
+use crate::apps::graph::scatter::ScatterGraph;
 use crate::apps::custom::text::TextCustom;
 use crate::models::table::RecordTable;
 
@@ -9,9 +10,9 @@ pub enum ChartType {
     Line(LineGraph),
     Bar(BarGraph),
     Pie,
-    Scatter,
+    Scatter(ScatterGraph),
     Histogram,
-    Text(TextCustom ),
+    Text(TextCustom),
     Image,
     Table
 }
@@ -23,7 +24,7 @@ impl ChartType {
             ChartType::Line(graph) => graph.draw_line_chart(ui, table_data, edit_mode),
             ChartType::Bar(graph) => graph.draw_bar_chart(ui, table_data, edit_mode),
             ChartType::Pie => self.render_pie_chart(ui),
-            ChartType::Scatter => self.render_scatter_chart(ui),
+            ChartType::Scatter(graph) => graph.draw_scatter_chart(ui, table_data, edit_mode),
             ChartType::Histogram => self.render_histogram_chart(ui),
             ChartType::Text(graph) => graph.set_up_text_layout(ui, edit_mode),
             ChartType::Image => self.render_image_layout(ui),
@@ -39,18 +40,6 @@ impl ChartType {
             ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
             ui.add_space(5.0);
             ui.label(egui::RichText::new("This is Pie Chart").size(15.0));
- 
-        });
-    }
-
-    fn render_scatter_chart(&self, ui: &mut egui::Ui) {
-        egui::Frame::default()
-        .inner_margin(egui::Margin::same(10.0)) // 패딩 설정
-        .show(ui, |ui| {
-
-            ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
-            ui.add_space(5.0);
-            ui.label(egui::RichText::new("This is Scatter Chart").size(15.0));
  
         });
     }
