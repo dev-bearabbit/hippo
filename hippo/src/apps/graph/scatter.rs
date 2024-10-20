@@ -1,5 +1,5 @@
 use egui::{Ui, Frame, Margin, RichText};
-use egui_plot::{Plot, PlotPoints, Points};
+use egui_plot::{Plot, Points};
 use crate::models::table::RecordTable;
 use crate::apps::util::Dropbox;
 
@@ -8,6 +8,10 @@ pub struct ScatterGraph {
     pub y_axis: Dropbox,
     pub x_val: Vec<f64>,
     pub y_val: Vec<f64>,
+    pub point_color: [f32; 3],
+    pub line_color: [f32; 3],
+    pub point_size: f32,
+    pub line_width: f32,
 }
 
 impl ScatterGraph {
@@ -17,6 +21,10 @@ impl ScatterGraph {
             y_axis: Dropbox::new(2),
             x_val: vec![0.0, 1.0, 2.0, 3.0, 5.0, 6.0, 7.0, 8.0],
             y_val: vec![3.0, 2.0, 1.0, 4.0, 5.0, 3.0, 2.0, 4.0],
+            point_color: [0.9703065, 0.8227896, 0.8227896],
+            line_color: [0.6352784, 0.13847084, 0.13847084],
+            point_size: 5.0,
+            line_width: 1.0,
         }
     }
 
@@ -38,6 +46,18 @@ impl ScatterGraph {
 
                             ui.label(RichText::new("Y axis").size(15.0));
                             self.y_axis.select_column_dropbox(ui, &columns);
+                        });
+                        ui.add_space(5.0);
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("Point color").size(13.0));
+                            ui.color_edit_button_rgb(&mut self.point_color);
+                            ui.label(egui::RichText::new("Point Size").size(13.0));
+                            ui.add(egui::Slider::new(&mut self.point_size, 0.0..=20.0));
+                            ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                            ui.label(egui::RichText::new("Line color").size(13.0));
+                            ui.color_edit_button_rgb(&mut self.line_color);
+                            ui.label(egui::RichText::new("Line Width").size(13.0));
+                            ui.add(egui::Slider::new(&mut self.line_width, 0.0..=10.0));
                         });
                     }
                     ui.add_space(5.0);
@@ -64,24 +84,40 @@ impl ScatterGraph {
                 let min_len = x_val.len().min(y_val.len());
 
                 // 점(point) 데이터 생성
-                let points: PlotPoints = x_val
+                let points: Vec<[f64; 2]> = x_val
                     .iter()
                     .zip(y_val.iter())
                     .take(min_len)
                     .map(|(&x, &y)| [x, y])
                     .collect();
 
-                // Points 객체를 생성해 점만 표시
-                let scatter_points = Points::new(points)
-                    .radius(5.0)  // 점의 크기 설정
-                    .name("Scatter Plot");
+                // 외곽선 역할을 하는 큰 점 (바깥 점)
+                let outer_points = Points::new(points.clone()) 
+                    .radius(self.point_size + self.line_width)  // 외곽선 크기
+                    .color(egui::Color32::from_rgb(
+                        (self.line_color[0] * 255.0).clamp(0.0, 255.0) as u8,
+                        (self.line_color[1] * 255.0).clamp(0.0, 255.0) as u8,
+                        (self.line_color[2] * 255.0).clamp(0.0, 255.0) as u8,
+                    ))         // 외곽선 색상
+                    .name("Outer Points");
+
+                // 내부 색상 역할을 하는 작은 점 (안쪽 점)
+                let inner_points = Points::new(points)
+                    .radius(self.point_size)        // 내부 점 크기
+                    .color(egui::Color32::from_rgb(
+                        (self.point_color[0] * 255.0).clamp(0.0, 255.0) as u8,
+                        (self.point_color[1] * 255.0).clamp(0.0, 255.0) as u8,
+                        (self.point_color[2] * 255.0).clamp(0.0, 255.0) as u8,
+                    ))        // 내부 점 색상
+                    .name("Inner Points");
 
                 Plot::new("scatter_plot")
                     .view_aspect(2.0)
                     .allow_zoom(true)
                     .allow_scroll(true)
                     .show(ui, |plot_ui| {
-                        plot_ui.points(scatter_points);
+                        plot_ui.points(outer_points);  // 외곽선 역할
+                        plot_ui.points(inner_points);  // 내부점 역할
                     });
             });
     }

@@ -8,6 +8,8 @@ pub struct BarGraph {
     pub y_axis: Dropbox,
     pub x_val: Vec<String>,
     pub y_val: Vec<f64>,
+    pub bar_color: egui::Color32,
+    pub line_stroke: egui::Stroke,
 }
 
 impl BarGraph {
@@ -17,6 +19,8 @@ impl BarGraph {
             y_axis: Dropbox::new(2),
             x_val: vec!["A", "B", "C", "D", "E", "F", "G", "N"].into_iter().map(|s| s.to_string()).collect(),
             y_val: vec![3.0, 2.0, 1.0, 4.0, 5.0, 3.0, 2.0, 4.0],
+            bar_color: egui::Color32::default(),
+            line_stroke: egui::Stroke::new(1.0, egui::Color32::default())
         }
     }
     pub fn draw_bar_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable, edit_mode: bool) {
@@ -34,11 +38,22 @@ impl BarGraph {
                     columns.insert(0, "select");
 
                     ui.horizontal(|ui| { 
-                        ui.label(egui::RichText::new("X axis").size(15.0));
+                        ui.label(egui::RichText::new("X axis").size(13.0));
                         self.x_axis.select_column_dropbox(ui, &columns);
-
-                        ui.label(egui::RichText::new("Y axis").size(15.0));
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Y axis").size(13.0));
                         self.y_axis.select_column_dropbox(ui, &columns);
+                    });
+                    ui.add_space(5.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("Bar color").size(13.0));
+                        ui.color_edit_button_srgba(&mut self.bar_color);
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Line color").size(13.0));
+                        ui.color_edit_button_srgba(&mut self.line_stroke.color);
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Line width").size(13.0));
+                        ui.add(egui::Slider::new(&mut self.line_stroke.width, 0.0..=10.0));
                     });
                 }
                 ui.add_space(5.0);
@@ -65,7 +80,9 @@ impl BarGraph {
                 .map(|i| {
                     let x = i as f64;
                     let y = self.y_val[i];
-                    Bar::new(x, y)  // Bar 생성
+                    Bar::new(x, y)
+                    .fill(self.bar_color)
+                    .stroke(self.line_stroke)  // Bar 생성
                 }).collect();
 
                 let bar_chart = BarChart::new(bars).width(0.5);

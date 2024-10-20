@@ -7,6 +7,8 @@ pub struct LineGraph {
     pub y_axis: Dropbox,
     pub x_val: Vec<f64>,
     pub y_val: Vec<f64>,
+    pub line_color: egui::Color32,
+    pub line_width: f32,
 }
 
 
@@ -17,6 +19,8 @@ impl LineGraph {
             y_axis: Dropbox::new(2),
             x_val: vec![0.0, 1.0, 2.0, 3.0, 5.0, 6.0, 7.0, 8.0],
             y_val: vec![3.0, 2.0, 1.0, 4.0, 5.0, 3.0, 2.0, 4.0],
+            line_color: egui::Color32::default(),
+            line_width: 2.0,
         }
     }
 
@@ -36,12 +40,21 @@ impl LineGraph {
                 } else {
                     columns.insert(0, "select");
                     ui.horizontal(|ui| { 
-                        ui.label(egui::RichText::new("X axis").size(15.0));
+                        ui.label(egui::RichText::new("X axis").size(13.0));
                         self.x_axis.select_column_dropbox(ui, &columns);
-
-                        ui.label(egui::RichText::new("Y axis").size(15.0));
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Y axis").size(13.0));
                         self.y_axis.select_column_dropbox(ui, &columns);
                     });
+                    ui.add_space(5.0);
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("Line color").size(13.0));
+                        ui.color_edit_button_srgba(&mut self.line_color);
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Line width").size(13.0));
+                        ui.add(egui::Slider::new(&mut self.line_width, 0.0..=10.0));
+                    });
+
                 }
                 ui.add_space(5.0);
                 ui.separator();
@@ -75,7 +88,9 @@ impl LineGraph {
                 .map(|(&x, &y)| [x, y])
                 .collect();
 
-            let line = Line::new(points);
+            let line = Line::new(points)
+                .color(self.line_color)
+                .width(self.line_width);
 
             Plot::new("line_chart")
                 .view_aspect(2.0)
