@@ -1,6 +1,6 @@
 use egui_plot::{BarChart, Bar, Plot, Text};
 use crate::models::table::RecordTable;
-use crate::apps::util::Dropbox;
+use crate::apps::util::{Dropbox, cast_data_type_as_f64};
 
 
 pub struct BarGraph {
@@ -120,11 +120,7 @@ impl BarGraph {
         .str()
         .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
         .unwrap_or_else(|_| Vec::new());
-
-        self.y_val = y_series
-            .i64()
-            .map(|ca| ca.into_iter().flatten().map(|v| v as f64).collect())
-            .unwrap_or_else(|_| Vec::new());
+        self.y_val = cast_data_type_as_f64(y_series);
     }
 
     fn _check_data_exist(&mut self, ui: &mut egui::Ui) {

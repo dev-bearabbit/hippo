@@ -1,6 +1,6 @@
 use egui_plot::{Line, Plot, PlotPoints};
 use crate::models::table::RecordTable;
-use crate::apps::util::Dropbox;
+use crate::apps::util::{Dropbox, cast_data_type_as_f64};
 
 pub struct LineGraph {
     pub x_axis: Dropbox,
@@ -17,7 +17,7 @@ impl LineGraph {
         Self {
             x_axis: Dropbox::new(1),
             y_axis: Dropbox::new(2),
-            x_val: vec![0.0, 1.0, 2.0, 3.0, 5.0, 6.0, 7.0, 8.0],
+            x_val: vec![0.0, 1.5, 2.0, 3.0, 5.0, 6.0, 7.0, 8.0],
             y_val: vec![3.0, 2.0, 1.0, 4.0, 5.0, 3.0, 2.0, 4.0],
             line_color: egui::Color32::default(),
             line_width: 2.0,
@@ -96,6 +96,7 @@ impl LineGraph {
                 .view_aspect(2.0)
                 .allow_zoom(false)  // 줌 비활성화 (선택 사항)
                 .allow_scroll(false)
+                .show_axes([true, true])
                 .show(ui, |plot_ui| {
                     plot_ui.line(line);
             });
@@ -110,15 +111,8 @@ impl LineGraph {
         let x_series = table_data.dataframe.column(x_col).unwrap();
         let y_series = table_data.dataframe.column(y_col).unwrap();
 
-        self.x_val = x_series
-        .i64()  // i64 타입으로 가져옴
-        .map(|ca| ca.into_iter().flatten().map(|v| v as f64).collect())  // f64로 변환
-        .unwrap_or_else(|_| Vec::new());
-
-        self.y_val = y_series
-        .i64()  // i64 타입으로 가져옴
-        .map(|ca| ca.into_iter().flatten().map(|v| v as f64).collect())  // f64로 변환
-        .unwrap_or_else(|_| Vec::new());
+        self.x_val = cast_data_type_as_f64(x_series);
+        self.x_val = cast_data_type_as_f64(y_series);
     }
 
     fn _check_data_exist(&mut self, ui: &mut egui::Ui) {

@@ -1,7 +1,7 @@
 use egui::{Ui, Frame, Margin, RichText};
 use egui_plot::{Plot, Points};
 use crate::models::table::RecordTable;
-use crate::apps::util::Dropbox;
+use crate::apps::util::{Dropbox, cast_data_type_as_f64};
 
 pub struct ScatterGraph {
     pub x_axis: Dropbox,
@@ -129,15 +129,8 @@ impl ScatterGraph {
         let x_series = table_data.dataframe.column(x_col).unwrap();
         let y_series = table_data.dataframe.column(y_col).unwrap();
 
-        self.x_val = x_series
-            .i64() // i64로 변환
-            .map(|ca| ca.into_iter().flatten().map(|v| v as f64).collect()) // f64로 변환
-            .unwrap_or_else(|_| Vec::new());
-
-        self.y_val = y_series
-            .i64()
-            .map(|ca| ca.into_iter().flatten().map(|v| v as f64).collect())
-            .unwrap_or_else(|_| Vec::new());
+        self.x_val = cast_data_type_as_f64(x_series);
+        self.y_val =cast_data_type_as_f64(y_series);
     }
 
     fn _check_data_exist(&mut self, ui: &mut Ui) {

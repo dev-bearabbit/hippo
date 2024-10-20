@@ -6,6 +6,8 @@ use crate::models::table::RecordTable;
 use super::graph::bar::BarGraph;
 use super::graph::line::LineGraph;
 use super::graph::scatter::ScatterGraph;
+use super::graph::histogram::HistogramGraph;
+use super::graph::pie::PieGraph;
 use super::custom::text::TextCustom;
 
 pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &mut Vec<Dashboard>, ctx: &egui::Context) {
@@ -48,13 +50,13 @@ pub fn custom_sidebar(ui: &mut egui::Ui, table_data: RecordTable, dashboards: &m
                     add_sidebar_dashboard_button(ui, 110.0, 30.0, "Bar graph", 13.0, dashboards, ChartType::Bar(BarGraph::new()));
                     ui.add_space(5.0);
 
-                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Pie graph", 13.0, dashboards, ChartType::Pie);
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Pie graph", 13.0, dashboards, ChartType::Pie(PieGraph::new()));
                     ui.add_space(5.0);
 
                     add_sidebar_dashboard_button(ui, 110.0, 30.0, "Scatter graph", 13.0, dashboards, ChartType::Scatter(ScatterGraph::new()));
                     ui.add_space(5.0);
 
-                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Histogram graph", 13.0, dashboards, ChartType::Histogram);
+                    add_sidebar_dashboard_button(ui, 110.0, 30.0, "Histogram graph", 13.0, dashboards, ChartType::Histogram(HistogramGraph::new()));
                     ui.add_space(5.0);
                 
                 ui.add_space(10.0);
