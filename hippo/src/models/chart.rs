@@ -25,7 +25,7 @@ impl ChartType {
         match self {
             ChartType::Line(graph) => graph.draw_line_chart(ui, table_data, edit_mode),
             ChartType::Bar(graph) => graph.draw_bar_chart(ui, table_data, edit_mode),
-            ChartType::Pie(graph) => graph.draw_pie_chart(ui),
+            ChartType::Pie(graph) => graph.draw_pie_chart(ui, table_data, edit_mode),
             ChartType::Scatter(graph) => graph.draw_scatter_chart(ui, table_data, edit_mode),
             ChartType::Histogram(graph) => graph.draw_histogram_chart(ui, table_data, edit_mode),
             ChartType::Text(graph) => graph.set_up_text_layout(ui, edit_mode),
