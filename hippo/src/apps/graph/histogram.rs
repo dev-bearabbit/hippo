@@ -66,6 +66,7 @@ impl HistogramGraph {
         egui::Frame::default()
             .inner_margin(egui::Margin::same(10.0))
             .show(ui, |ui| {
+                
                 if self.x_axis.selected != 0 {
                     self._cleaning_data_type(table_data);
                 }
