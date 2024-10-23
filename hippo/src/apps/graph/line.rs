@@ -112,7 +112,7 @@ impl LineGraph {
         let y_series = table_data.dataframe.column(y_col).unwrap();
 
         self.x_val = cast_data_type_as_f64(x_series);
-        self.x_val = cast_data_type_as_f64(y_series);
+        self.y_val = cast_data_type_as_f64(y_series);
     }
 
     fn _check_data_exist(&mut self, ui: &mut egui::Ui) {

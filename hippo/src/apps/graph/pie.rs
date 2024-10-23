@@ -176,6 +176,11 @@ impl PieGraph {
         .unwrap_or_else(|_| Vec::new());
         let value_f64 = cast_data_type_as_f64(v_series);
         self.value_val = value_f64.iter().map(|&x| x as f32).collect();
+
+        // 섹터의 길이에 맞게 색상 벡터를 조정
+        let num_sectors = self.value_val.len();
+        self.sector_colors.resize(num_sectors, Color32::default());
+        self.stroke_colors.resize(num_sectors, Color32::BLACK);
     }
     
     // 파이 섹터 그리기 함수 (클릭 감지용 Response 반환)
