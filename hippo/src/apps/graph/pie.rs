@@ -1,13 +1,15 @@
 use egui::{Color32, FontId, Pos2, Vec2};
 use std::f32::consts::PI;
 use crate::models::table::RecordTable;
-use crate::apps::util::{Dropbox, cast_data_type_as_f64};
+use crate::apps::util::{cast_data_type_as_f64, CalculateType, Dropbox};
 
 pub struct PieGraph {
     pub value_col: Dropbox,
     pub label_col: Dropbox,
+    pub calculate_col: Dropbox,
     pub value_val: Vec<f32>,
     pub label_val: Vec<String>,
+    pub calculate_val: CalculateType,
     pub sector_colors: Vec<Color32>,
     pub sector_gap: f32,
     pub stroke_width: f32,
@@ -19,8 +21,10 @@ impl PieGraph {
         Self { 
                value_col:Dropbox::new(1),
                label_col: Dropbox::new(2),
+               calculate_col: Dropbox::new(3),
                value_val: vec![30.0, 20.0, 10.0, 15.0, 10.0, 5.0, 15.0],
                label_val: vec!["A", "B", "C", "D", "E", "F", "G"].into_iter().map(|s| s.to_string()).collect(),
+               calculate_val: CalculateType::Count,
                sector_colors: vec![egui::Color32::default(); 7],
                sector_gap: 0.0,
                stroke_width: 1.0,
@@ -36,7 +40,7 @@ impl PieGraph {
                 ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
                 ui.add_space(5.0);
                 let mut columns = table_data.dataframe.get_column_names();
-
+                let cal_methods = CalculateType::Count.list_calculate_types();
                 if columns.is_empty() {
                     self._check_data_exist(ui);
                 } else {
@@ -47,6 +51,9 @@ impl PieGraph {
                         ui.allocate_space(egui::Vec2::new(10.0, 0.0));
                         ui.label(egui::RichText::new("Value").size(13.0));
                         self.value_col.select_column_dropbox(ui, &columns);
+                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
+                        ui.label(egui::RichText::new("Calculate").size(13.0));
+                        self.calculate_col.select_column_dropbox(ui, &cal_methods);
                     });
                 ui.add_space(5.0);
                 ui.horizontal(|ui| { 
@@ -63,7 +70,7 @@ impl PieGraph {
                 ui.horizontal(|ui| { 
                     let total_width = ui.available_width();
                     let color_panel_width = total_width * 0.3; // 적절한 비율로 색상 선택 패널 너비 설정
-                    let pie_chart_width = total_width * 0.7;   // 나머지 공간을 파이 차트에 할당
+                    let pie_chart_width = total_width * 0.7; // 나머지 공간을 파이 차트에 할당
                     // Pie Chart Layout
                     ui.allocate_ui_with_layout(
                         Vec2::new(pie_chart_width, ui.available_height()),
@@ -93,7 +100,7 @@ impl PieGraph {
 
     pub fn set_pie_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable) {
 
-        if self.value_col.selected != 0 && self.label_col.selected != 0 {
+        if self.value_col.selected != 0 && self.label_col.selected != 0 && self.calculate_col.selected != 0{
             self._cleaning_data_type(table_data);
         }
 
@@ -164,9 +171,14 @@ impl PieGraph {
     fn _cleaning_data_type(&mut self, table_data: &RecordTable) {
         let l_col = table_data.dataframe.get_column_names()[self.label_col.selected - 1];
         let v_col = table_data.dataframe.get_column_names()[self.value_col.selected - 1];
+        let cal_methods = CalculateType::Count.list_calculate_types();
+        self.calculate_val = CalculateType::try_from(cal_methods[self.calculate_col.selected]).unwrap();
 
         let l_series = table_data.dataframe.column(l_col).unwrap();
         let v_series = table_data.dataframe.column(v_col).unwrap();
+
+        // self.calculate_val.execute(l_series, v_series);
+
 
         self.label_val = l_series
         .cast(&polars::prelude::DataType::String)
@@ -174,6 +186,7 @@ impl PieGraph {
         .str()
         .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
         .unwrap_or_else(|_| Vec::new());
+    
         let value_f64 = cast_data_type_as_f64(v_series);
         self.value_val = value_f64.iter().map(|&x| x as f32).collect();
 

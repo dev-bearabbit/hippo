@@ -1,3 +1,4 @@
+use crate::models::error::TableError;
 use crate::models::table::RecordTable;
 use crate::apps::file;
 
@@ -21,6 +22,9 @@ impl Menu {
                         Ok(data) => {
                             self.table_data = data;
                         },
+                        Err(TableError::NotFound(_)) => {
+                            println!("Not Found File");
+                        },
                         Err(e) => {
                             println!("Error: {:?}", e);
                             self.invalid_file = true;
@@ -34,6 +38,9 @@ impl Menu {
                     match file {
                         Ok(data) => {
                             self.table_data = data;
+                        },
+                        Err(TableError::NotFound(_)) => {
+                            println!("Not Found File");
                         },
                         Err(e) => {
                             println!("Error: {:?}", e);
@@ -54,13 +61,13 @@ impl Menu {
             });
     
             self.theme_light_dark_mode(ui);
-            self.show_invalid_file_popup(ctx);
+            self.show_file_error_popup(ctx);
         });
 
         ui.separator();
     }
 
-    fn show_invalid_file_popup(&mut self, ctx: &egui::Context) {
+    fn show_file_error_popup(&mut self, ctx: &egui::Context) {
         if self.invalid_file {
             egui::Window::new("Invalid File")
                 .collapsible(false)
