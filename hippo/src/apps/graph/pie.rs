@@ -174,8 +174,9 @@ impl PieGraph {
         let v_col = table_data.dataframe.get_column_names()[self.value_col.selected - 1];
 
         let l_series = table_data.dataframe.column(l_col).unwrap();
-        let v_series = table_data.dataframe.column(v_col).unwrap();
+        let v_series = table_data.dataframe.column(v_col).unwrap().clone();
 
+        // TODO: 데이터 타입 이슈 해결 요망
         let calculated_data = calculate_pie_value
                                                 (l_series, v_series, &self.calculate_val);
 
