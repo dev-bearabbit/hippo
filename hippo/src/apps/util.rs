@@ -50,48 +50,32 @@ pub fn cast_data_type_as_f64(col_data :&Series) -> Vec<f64> {
     }
 }
 
-#[derive(Debug)]
-pub enum CalculateType {
-    Sum,
-    Count,
-    Mean,
-    Median,
-    Max,
-    Min,
-    Nunique,
-    First,
-    Last
-}
 
-impl CalculateType {
+pub fn calculate_pie_value(x_series: &Series, y_series: &Series, mhd: &str) ->  (Vec<String>, Vec<f32>) {
 
-    pub fn list_calculate_types(&self) -> Vec<&str> {
-        vec!["select", "count", "sum", "mean", "median", "max", "min", "nunique", "first", "last"]
-    }
+        let x_name = x_series.name();
+        let y_name = y_series.name();
 
-    pub fn execute(&mut self, x_series: Series, y_series: Series) ->  (Vec<String>, Vec<f32>) {
-
-        let df = DataFrame::new(vec![x_series, y_series]).unwrap();
+        let df = DataFrame::new(vec![x_series.clone(), y_series.clone()]).unwrap();
         let lazy_df = df.lazy();
-    
-        // 그룹화한 결과를 CalculateType에 따라 계산
-        let result_series = match self {
-            CalculateType::Count => lazy_df.group_by([col("x_series")]).agg([col("y_series").count().alias("result")]),
-            CalculateType::Sum => lazy_df.group_by([col("x_series")]).agg([col("y_series").sum().alias("result")]),
-            CalculateType::Mean => lazy_df.group_by([col("x_series")]).agg([col("y_series").mean().alias("result")]),
-            CalculateType::Median => lazy_df.group_by([col("x_series")]).agg([col("y_series").median().alias("result")]),
-            CalculateType::Max => lazy_df.group_by([col("x_series")]).agg([col("y_series").max().alias("result")]),
-            CalculateType::Min => lazy_df.group_by([col("x_series")]).agg([col("y_series").min().alias("result")]),
-            CalculateType::Nunique => lazy_df.group_by([col("x_series")]).agg([col("y_series").n_unique().alias("result")]),
-            CalculateType::First => lazy_df.group_by([col("x_series")]).agg([col("y_series").first().alias("result")]),
-            CalculateType::Last => lazy_df.group_by([col("x_series")]).agg([col("y_series").last().alias("result")]),
-
+        let result_series = match mhd {
+            "count" => lazy_df.group_by([col(x_name)]).agg([col(y_name).count().alias("result")]),
+            "sum" => lazy_df.group_by([col(x_name)]).agg([col(y_name).sum().alias("result")]),
+            "mean" => lazy_df.group_by([col(x_name)]).agg([col(y_name).mean().alias("result")]),
+            "median" => lazy_df.group_by([col(x_name)]).agg([col(y_name).median().alias("result")]),
+            "max" => lazy_df.group_by([col(x_name)]).agg([col(y_name).max().alias("result")]),
+            "min" => lazy_df.group_by([col(x_name)]).agg([col(y_name).min().alias("result")]),
+            "nunique" => lazy_df.group_by([col(x_name)]).agg([col(y_name).n_unique().alias("result")]),
+            "first" => lazy_df.group_by([col(x_name)]).agg([col(y_name).first().alias("result")]),
+            "last" => lazy_df.group_by([col(x_name)]).agg([col(y_name).last().alias("result")]),
+            "select" => lazy_df,
+            _ => lazy_df,
         };
 
         let result_df = result_series.collect().unwrap();
 
         let x_vals: Vec<String> = result_df
-            .column("x_val")
+            .column(x_name)
             .unwrap()
             .cast(&polars::prelude::DataType::String)
             .unwrap()
@@ -99,32 +83,80 @@ impl CalculateType {
             .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
             .unwrap_or_else(|_| Vec::new());
 
+        println!("{:?}", result_df.column("result").unwrap());
+
         let y_vals: Vec<f32> = result_df
             .column("result")
             .unwrap()
-            .f32()
-            .map(|ca| ca.into_iter().flatten().collect())
+            .u32()
+            .map(|ca| ca.into_iter().flatten().map(|v| v as f32).collect())
             .unwrap_or_else(|_| Vec::new());
 
         (x_vals, y_vals)
     }
-}
 
-impl TryFrom<&str> for CalculateType {
-    type Error = &'static str;
+// impl CalculateType {
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "sum" => Ok(CalculateType::Sum),
-            "count" => Ok(CalculateType::Count),
-            "mean" => Ok(CalculateType::Mean),
-            "median" => Ok(CalculateType::Median),
-            "max" => Ok(CalculateType::Max),
-            "min" => Ok(CalculateType::Min),
-            "nunique" => Ok(CalculateType::Nunique),
-            "first" => Ok(CalculateType::First),
-            "last" => Ok(CalculateType::Last),
-            _ => Err("Invalid calculation type"),
-        }
-    }
-}
+//     pub fn list_calculate_types(&self) -> Vec<&str> {
+//         vec!["select", "count", "sum", "mean", "median", "max", "min", "nunique", "first", "last"]
+//     }
+
+//     pub fn execute(&mut self, x_series: Series, y_series: Series) ->  (Vec<String>, Vec<f32>) {
+
+//         let df = DataFrame::new(vec![x_series, y_series]).unwrap();
+//         let lazy_df = df.lazy();
+    
+//         // 그룹화한 결과를 CalculateType에 따라 계산
+//         let result_series = match self {
+//             CalculateType::Count => lazy_df.group_by([col(x_name)]).agg([col(y_name).count().alias("result")]),
+//             CalculateType::Sum => lazy_df.group_by([col(x_name)]).agg([col(y_name).sum().alias("result")]),
+//             CalculateType::Mean => lazy_df.group_by([col(x_name)]).agg([col(y_name).mean().alias("result")]),
+//             CalculateType::Median => lazy_df.group_by([col(x_name)]).agg([col(y_name).median().alias("result")]),
+//             CalculateType::Max => lazy_df.group_by([col(x_name)]).agg([col(y_name).max().alias("result")]),
+//             CalculateType::Min => lazy_df.group_by([col(x_name)]).agg([col(y_name).min().alias("result")]),
+//             CalculateType::Nunique => lazy_df.group_by([col(x_name)]).agg([col(y_name).n_unique().alias("result")]),
+//             CalculateType::First => lazy_df.group_by([col(x_name)]).agg([col(y_name).first().alias("result")]),
+//             CalculateType::Last => lazy_df.group_by([col(x_name)]).agg([col(y_name).last().alias("result")]),
+
+//         };
+
+//         let result_df = result_series.collect().unwrap();
+
+//         let x_vals: Vec<String> = result_df
+//             .column("x_val")
+//             .unwrap()
+//             .cast(&polars::prelude::DataType::String)
+//             .unwrap()
+//             .str()
+//             .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
+//             .unwrap_or_else(|_| Vec::new());
+
+//         let y_vals: Vec<f32> = result_df
+//             .column("result")
+//             .unwrap()
+//             .f32()
+//             .map(|ca| ca.into_iter().flatten().collect())
+//             .unwrap_or_else(|_| Vec::new());
+
+//         (x_vals, y_vals)
+//     }
+// }
+
+// impl TryFrom<&str> for CalculateType {
+//     type Error = &'static str;
+
+//     fn try_from(value: &str) -> Result<Self, Self::Error> {
+//         match value {
+//             "sum" => Ok(CalculateType::Sum),
+//             "count" => Ok(CalculateType::Count),
+//             "mean" => Ok(CalculateType::Mean),
+//             "median" => Ok(CalculateType::Median),
+//             "max" => Ok(CalculateType::Max),
+//             "min" => Ok(CalculateType::Min),
+//             "nunique" => Ok(CalculateType::Nunique),
+//             "first" => Ok(CalculateType::First),
+//             "last" => Ok(CalculateType::Last),
+//             _ => Err("Invalid calculation type"),
+//         }
+//     }
+// }

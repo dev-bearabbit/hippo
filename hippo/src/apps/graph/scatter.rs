@@ -51,11 +51,13 @@ impl ScatterGraph {
                         ui.horizontal(|ui| {
                             ui.label(egui::RichText::new("Point color").size(13.0));
                             ui.color_edit_button_rgb(&mut self.point_color);
-                            ui.label(egui::RichText::new("Point Size").size(13.0));
-                            ui.add(egui::Slider::new(&mut self.point_size, 0.0..=20.0));
-                            ui.allocate_space(egui::Vec2::new(10.0, 0.0));
                             ui.label(egui::RichText::new("Line color").size(13.0));
                             ui.color_edit_button_rgb(&mut self.line_color);
+                        });
+                        ui.add_space(5.0);
+                        ui.horizontal(|ui| {
+                            ui.label(egui::RichText::new("Point Size").size(13.0));
+                            ui.add(egui::Slider::new(&mut self.point_size, 0.0..=10.0));
                             ui.label(egui::RichText::new("Line Width").size(13.0));
                             ui.add(egui::Slider::new(&mut self.line_width, 0.0..=10.0));
                         });

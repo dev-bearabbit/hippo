@@ -1,7 +1,7 @@
 use egui::{Color32, FontId, Pos2, Vec2};
 use std::f32::consts::PI;
 use crate::models::table::RecordTable;
-use crate::apps::util::{cast_data_type_as_f64, CalculateType, Dropbox};
+use crate::apps::util::{calculate_pie_value, Dropbox};
 
 pub struct PieGraph {
     pub value_col: Dropbox,
@@ -9,7 +9,7 @@ pub struct PieGraph {
     pub calculate_col: Dropbox,
     pub value_val: Vec<f32>,
     pub label_val: Vec<String>,
-    pub calculate_val: CalculateType,
+    pub calculate_val: String,
     pub sector_colors: Vec<Color32>,
     pub sector_gap: f32,
     pub stroke_width: f32,
@@ -24,7 +24,7 @@ impl PieGraph {
                calculate_col: Dropbox::new(3),
                value_val: vec![30.0, 20.0, 10.0, 15.0, 10.0, 5.0, 15.0],
                label_val: vec!["A", "B", "C", "D", "E", "F", "G"].into_iter().map(|s| s.to_string()).collect(),
-               calculate_val: CalculateType::Count,
+               calculate_val: String::new(),
                sector_colors: vec![egui::Color32::default(); 7],
                sector_gap: 0.0,
                stroke_width: 1.0,
@@ -40,7 +40,7 @@ impl PieGraph {
                 ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
                 ui.add_space(5.0);
                 let mut columns = table_data.dataframe.get_column_names();
-                let cal_methods = CalculateType::Count.list_calculate_types();
+                let cal_methods = vec!["select", "count", "sum", "mean", "median", "max", "min", "nunique", "first", "last"];
                 if columns.is_empty() {
                     self._check_data_exist(ui);
                 } else {
@@ -54,6 +54,8 @@ impl PieGraph {
                         ui.allocate_space(egui::Vec2::new(10.0, 0.0));
                         ui.label(egui::RichText::new("Calculate").size(13.0));
                         self.calculate_col.select_column_dropbox(ui, &cal_methods);
+                        self.calculate_val = cal_methods[self.calculate_col.selected].to_string();
+
                     });
                 ui.add_space(5.0);
                 ui.horizontal(|ui| { 
@@ -131,7 +133,6 @@ impl PieGraph {
             let offset_y = mid_angle.sin() * self.sector_gap;
             let sector_center = Pos2::new(center.x + offset_x, center.y + offset_y);
 
-            // 클릭을 감지하기 위해 Response를 수집
             self.draw_pie_sector(ui, sector_center, radius, start_angle, end_angle, self.sector_colors[i], self.stroke_colors[i]);
 
             // 섹터 레이블 표시
@@ -171,24 +172,15 @@ impl PieGraph {
     fn _cleaning_data_type(&mut self, table_data: &RecordTable) {
         let l_col = table_data.dataframe.get_column_names()[self.label_col.selected - 1];
         let v_col = table_data.dataframe.get_column_names()[self.value_col.selected - 1];
-        let cal_methods = CalculateType::Count.list_calculate_types();
-        self.calculate_val = CalculateType::try_from(cal_methods[self.calculate_col.selected]).unwrap();
 
         let l_series = table_data.dataframe.column(l_col).unwrap();
         let v_series = table_data.dataframe.column(v_col).unwrap();
 
-        // self.calculate_val.execute(l_series, v_series);
+        let calculated_data = calculate_pie_value
+                                                (l_series, v_series, &self.calculate_val);
 
-
-        self.label_val = l_series
-        .cast(&polars::prelude::DataType::String)
-        .unwrap()
-        .str()
-        .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
-        .unwrap_or_else(|_| Vec::new());
-    
-        let value_f64 = cast_data_type_as_f64(v_series);
-        self.value_val = value_f64.iter().map(|&x| x as f32).collect();
+        self.label_val = calculated_data.0;
+        self.value_val = calculated_data.1;
 
         // 섹터의 길이에 맞게 색상 벡터를 조정
         let num_sectors = self.value_val.len();
