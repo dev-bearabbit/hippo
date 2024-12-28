@@ -178,7 +178,7 @@ impl PieGraph {
 
         // TODO: 데이터 타입 이슈 해결 요망
         let calculated_data = calculate_pie_value
-                                                (l_series, v_series, &self.calculate_val);
+                                                (l_series, &v_series, &self.calculate_val);
 
         self.label_val = calculated_data.0;
         self.value_val = calculated_data.1;

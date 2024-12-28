@@ -50,7 +50,7 @@ pub fn cast_data_type_as_f64(col_data :&Series) -> Vec<f64> {
     }
 }
 
-// TODO: 데이터 타입 이슈 해결 요망
+// TODO: 데이터 타입 이슈 해결 요망 
 pub fn calculate_pie_value(x_series: &Series, y_series: &Series, mhd: &str) ->  (Vec<String>, Vec<f32>) {
 
         let x_name = x_series.name();
