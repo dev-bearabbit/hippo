@@ -1,19 +1,18 @@
 use egui::{Color32, FontId, Pos2, Vec2};
 use std::f32::consts::PI;
 use crate::models::table::RecordTable;
-use crate::apps::util::{calculate_pie_value, Dropbox};
+use crate::apps::util::{cast_data_type_as_f64,Dropbox};
 
 pub struct PieGraph {
     pub value_col: Dropbox,
     pub label_col: Dropbox,
-    pub calculate_col: Dropbox,
     pub value_val: Vec<f32>,
     pub label_val: Vec<String>,
-    pub calculate_val: String,
+    pub label_size: f32,
     pub sector_colors: Vec<Color32>,
     pub sector_gap: f32,
     pub stroke_width: f32,
-    pub stroke_colors: Vec<egui::Color32>,
+    pub stroke_color: Color32,
 }
 
 impl PieGraph {
@@ -21,18 +20,19 @@ impl PieGraph {
         Self { 
                value_col:Dropbox::new(1),
                label_col: Dropbox::new(2),
-               calculate_col: Dropbox::new(3),
                value_val: vec![30.0, 20.0, 10.0, 15.0, 10.0, 5.0, 15.0],
                label_val: vec!["A", "B", "C", "D", "E", "F", "G"].into_iter().map(|s| s.to_string()).collect(),
-               calculate_val: String::new(),
+               label_size: 10.0,
                sector_colors: vec![egui::Color32::default(); 7],
                sector_gap: 0.0,
                stroke_width: 1.0,
-               stroke_colors: vec![egui::Color32::BLACK; 7], 
+               stroke_color: egui::Color32::BLACK, 
             }
-    }
+        }
 
     pub fn draw_pie_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable, edit_mode: bool) {
+        self.setup_basic_stroke_color(ui);
+
         if edit_mode {
             egui::Frame::default()
             .inner_margin(egui::Margin::same(10.0))
@@ -40,7 +40,6 @@ impl PieGraph {
                 ui.label(egui::RichText::new("Select Value to Draw").size(20.0).strong());
                 ui.add_space(5.0);
                 let mut columns = table_data.dataframe.get_column_names();
-                let cal_methods = vec!["select", "count", "sum", "mean", "median", "max", "min", "nunique", "first", "last"];
                 if columns.is_empty() {
                     self._check_data_exist(ui);
                 } else {
@@ -51,11 +50,8 @@ impl PieGraph {
                         ui.allocate_space(egui::Vec2::new(10.0, 0.0));
                         ui.label(egui::RichText::new("Value").size(13.0));
                         self.value_col.select_column_dropbox(ui, &columns);
-                        ui.allocate_space(egui::Vec2::new(10.0, 0.0));
-                        ui.label(egui::RichText::new("Calculate").size(13.0));
-                        self.calculate_col.select_column_dropbox(ui, &cal_methods);
-                        self.calculate_val = cal_methods[self.calculate_col.selected].to_string();
-
+                        ui.label(egui::RichText::new("Label Size").size(13.0));
+                        ui.add(egui::Slider::new(&mut self.label_size, 0.0..=100.0));
                     });
                 ui.add_space(5.0);
                 ui.horizontal(|ui| { 
@@ -102,7 +98,7 @@ impl PieGraph {
 
     pub fn set_pie_chart(&mut self, ui: &mut egui::Ui, table_data: &RecordTable) {
 
-        if self.value_col.selected != 0 && self.label_col.selected != 0 && self.calculate_col.selected != 0{
+        if self.value_col.selected != 0 && self.label_col.selected != 0 {
             self._cleaning_data_type(table_data);
         }
 
@@ -133,7 +129,7 @@ impl PieGraph {
             let offset_y = mid_angle.sin() * self.sector_gap;
             let sector_center = Pos2::new(center.x + offset_x, center.y + offset_y);
 
-            self.draw_pie_sector(ui, sector_center, radius, start_angle, end_angle, self.sector_colors[i], self.stroke_colors[i]);
+            self.draw_pie_sector(ui, sector_center, radius, start_angle, end_angle, self.sector_colors[i], self.stroke_color);
 
             // 섹터 레이블 표시
             let label_angle = start_angle + sweep_angle / 2.0;
@@ -143,26 +139,26 @@ impl PieGraph {
                 sector_center.y + label_angle.sin() * radius * 0.7,
             );
 
-            let font_id = FontId::proportional(14.0);  // 글자 크기 지정
-            ui.painter().text(label_pos, egui::Align2::CENTER_CENTER, &self.label_val[i], font_id, Color32::BLACK);
+            let font_id = FontId::proportional(self.label_size);  // 글자 크기 지정
+            if self._is_dark_mode(ui) {
+                ui.painter().text(label_pos, egui::Align2::CENTER_CENTER, &self.label_val[i], font_id, Color32::WHITE);
+            } else {
+                ui.painter().text(label_pos, egui::Align2::CENTER_CENTER, &self.label_val[i], font_id, Color32::BLACK);
+            }
 
             start_angle = end_angle; // 다음 섹터 시작점
         }
     }
 
-    fn select_sector_color(&mut self, ui: &mut egui::Ui,) {
+    fn select_sector_color(&mut self, ui: &mut egui::Ui) {
 
         for (i, &_value) in self.value_val.iter().enumerate() {
             // 섹터가 클릭되면 색상 선택 UI와 테두리 굵기 선택 UI를 표시
                 ui.vertical(|ui| { 
-                    ui.label(egui::RichText::new("Col Name").size(13.0).strong());
+                    ui.label(egui::RichText::new(self.label_val[i].clone()).size(13.0).strong());
                     ui.horizontal(|ui| { 
-                        ui.label("Sector Color:");
+                        ui.label("Color:");
                         ui.color_edit_button_srgba(&mut self.sector_colors[i]);
-                    });
-                    ui.horizontal(|ui| { 
-                        ui.label("Stroke Color:");
-                        ui.color_edit_button_srgba(&mut self.stroke_colors[i]);
                     });
                     ui.add_space(3.0);
                 });
@@ -176,17 +172,18 @@ impl PieGraph {
         let l_series = table_data.dataframe.column(l_col).unwrap();
         let v_series = table_data.dataframe.column(v_col).unwrap().clone();
 
-        // TODO: 데이터 타입 이슈 해결 요망
-        let calculated_data = calculate_pie_value
-                                                (l_series, &v_series, &self.calculate_val);
-
-        self.label_val = calculated_data.0;
-        self.value_val = calculated_data.1;
+        self.label_val = l_series
+        .cast(&polars::prelude::DataType::String)
+        .unwrap()
+        .str()
+        .map(|ca| ca.into_iter().flatten().map(|v| v.to_string()).collect())
+        .unwrap_or_else(|_| Vec::new());
+        let value_f64 = cast_data_type_as_f64(&v_series);
+        self.value_val = value_f64.iter().map(|&x| x as f32).collect();
 
         // 섹터의 길이에 맞게 색상 벡터를 조정
         let num_sectors = self.value_val.len();
         self.sector_colors.resize(num_sectors, Color32::default());
-        self.stroke_colors.resize(num_sectors, Color32::BLACK);
     }
     
     // 파이 섹터 그리기 함수 (클릭 감지용 Response 반환)
@@ -217,6 +214,18 @@ impl PieGraph {
         ui.label(egui::RichText::new("Not Found Data.").size(15.0));
         ui.add_space(5.0);
         ui.label(egui::RichText::new("Please Import CSV or Excel File").size(15.0));
+    }
+
+    fn _is_dark_mode(&self, ui: &mut egui::Ui) -> bool {
+        ui.ctx().style().visuals.dark_mode
+    }
+
+    fn setup_basic_stroke_color(&mut self, ui: &mut egui::Ui) {
+        if self._is_dark_mode(ui) {
+            self.stroke_color = egui::Color32::WHITE;
+        } else {
+            self.stroke_color = egui::Color32::BLACK;
+        }
     }
 
 }
